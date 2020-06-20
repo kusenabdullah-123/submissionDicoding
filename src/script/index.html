@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Movie Search</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <div class="app-bar">
+        <h2>Movie</h2>
+      </div>
+    </header>
+    <div class="search" id="search">
+      <input type="search" id="Search" placeholder="Search movie" />
+      <button type="submit" id="SearchButton">Search</button>
+    </div>
+    <main>
+      <div class="content"></div>
+    </main>
+    <script>
+      const getMovie = async (keyword) => {
+        const response = await fetch(
+          `http://www.omdbapi.com/?s=${keyword}&apikey=5b4b89d6`
+        );
+        const json = await response.json();
+        if (json.Response == "True") {
+          return json;
+        } else {
+          throw new Error(json.Error);
+        }
+      };
+      document
+        .querySelector("#SearchButton")
+        .addEventListener("click", async function () {
+          try {
+            const content = document.querySelector(".content").innerHTML;
+            content = "";
+            const key = document.querySelector("#Search").value;
+            const { Search: movies } = await getMovie(key);
+            let html = "";
+            movies.forEach(({ Title, Poster, Type, Year }) => {
+              html += `<div class="card">
+                          <img src="${Poster}" alt="image" class="image" />
+                          <div class="container">
+                            <h3>Title : <b>${Title}</b></h3>
+                            <p>Type : ${Type}</p>
+                            <p>year : ${Year}</p>
+                          </div>
+                      </div>`;
+            });
+            console.log(html);
+          } catch (error) {
+            document.querySelector(".content").innerHTML = `<h2>${error}</h2>`;
+          }
+        });
+    </script>
+  </body>
+</html>
